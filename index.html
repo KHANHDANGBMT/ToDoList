@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/css.css">
+    <script type="text/javascript" src="./js/javascript.js"></script>
+    <script src="https://kit.fontawesome.com/cacc044b13.js" crossorigin="anonymous"></script>
+    <title>To Do List</title>
+</head>
+<body>
+    <header>
+        <h1 class="header-content">to do list</h1>
+    </header>
+    <section class="section-input">
+        <form class="form-input" action="">
+            <input id="input-todo" type="text" 
+            placeholder="What needs to be done?" 
+            autofocus onkeypress="javascript:inputKeyPress(event);" >
+            <ul id="list-content">
+                <li id="li-component" onmouseover="javascript:liOnMouseOver();" 
+                onmouseout="javscript:liOnMouseOut();">
+                    <i class="far fa-circle" onclick="javascript:Complete(event);"></i>
+                    <label id="radio">hello</label>
+                    <button id="button" onclick="javascript:buttonOnClick(event);">X</button>
+                </li>
+            </ul>
+        </form>
+        
+    </section>
+    
+    
+    
+    
+</body>
+</html>
