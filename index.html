@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/css.css">
     <script type="text/javascript" src="./js/javascript.js"></script>
     <script src="https://kit.fontawesome.com/cacc044b13.js" crossorigin="anonymous"></script>
+    <link rel="icon" href="favicon.ico/favicon.ico">
     <title>To Do List</title>
 </head>
 <body>
@@ -14,17 +15,13 @@
         <h1 class="header-content">to do list</h1>
     </header>
     <section class="section-input">
-        <form class="form-input" action="">
+        <form class="form-input" action="" autocomplete="off">
             <input id="input-todo" type="text" 
             placeholder="What needs to be done?" 
             autofocus onkeypress="javascript:inputKeyPress(event);" >
             <ul id="list-content">
-                <li id="li-component" onmouseover="javascript:liOnMouseOver();" 
-                onmouseout="javscript:liOnMouseOut();">
-                    <i class="far fa-circle" onclick="javascript:Complete(event);"></i>
-                    <label id="radio">hello</label>
-                    <button id="button" onclick="javascript:buttonOnClick(event);">X</button>
-                </li>
+            </ul>
+            <ul id="option">
             </ul>
         </form>
         
