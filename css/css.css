@@ -89,11 +89,14 @@ body {
     border-top: 1px solid #9f9f9fc7;
     padding: 5px;
     margin: 10px 20px;
+<<<<<<< HEAD
     font-family: sans-serif;
     opacity: 0.9;
     font-size: 15px;
     outline: none;
    
+=======
+>>>>>>> fix check todo, add button clearAll, clearDone
 }
 #total-item {
     opacity: 0.5;
