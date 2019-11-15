@@ -1,4 +1,10 @@
 let totalTodo = 0 ;
+let arrayList = [];
+let numberItem = 0;
+let selectShow = 'all';
+let select = document.getElementById("select-all");
+select.addEventListener('click',selectAll);
+
 function inputKeyPress(event){
     if((event.keyCode ==13||event.which==13) ){
         event.preventDefault();
@@ -9,15 +15,19 @@ function inputKeyPress(event){
             const ul = document.getElementById("list-content");
             const li = document.createElement("li");
             li.setAttribute("id","li-component");
+            li.setAttribute("numberItem",numberItem);
+            numberItem ++;
+
             // create icon
             const i = document.createElement("i");
-            i.setAttribute("class", "far fa-circle");
+            i.setAttribute("class", "icon circle");
             i.addEventListener('click',onIconClick,false);
             li.appendChild(i);
             // create label
             const label = document.createElement("label");
             label.setAttribute("id","content-todo");
             label.appendChild(content);
+            label.addEventListener('dblclick',editText);
             li.appendChild(label);
             // button
             const button = document.createElement("button");
@@ -26,7 +36,10 @@ function inputKeyPress(event){
             button.appendChild(node);
             button.addEventListener('click',deleteTodo,false);
             li.appendChild(button);
+
             ul.appendChild(li);
+
+            addList(numberItem-1,valueInput, false);
             // input ="" before add new todo
             document.getElementById("input-todo").value ="";
             totalTodo+=1;
@@ -46,16 +59,47 @@ function inputKeyPress(event){
                 buttonClearDone.addEventListener('click', deleteDone, false);
                 
                 const itemLeft = document.createElement('p');
-                const textItemLeft = document.createTextNode("Total Item : "+totalTodo);
+                const textItemLeft = document.createTextNode("item left: "+totalTodo);
                 itemLeft.setAttribute("id", "total-item");
                 itemLeft.appendChild(textItemLeft);
 
+                const buttonActive = document.createElement('input');
+                buttonActive.setAttribute("type", "button");
+                buttonActive.setAttribute("value", "Active");
+                buttonActive.setAttribute("class","button-option");
+                buttonActive.addEventListener('click', hiddenCompletedItem, false);
+                
+                const buttonCompleted = document.createElement('input');
+                buttonCompleted.setAttribute("type", "button");
+                buttonCompleted.setAttribute("value", "Completed");
+                buttonCompleted.setAttribute("class","button-option");
+                buttonCompleted.addEventListener('click',hiddenActiveItem , false);
+
+                const buttonAll = document.createElement('input');
+                buttonAll.setAttribute("type", "button");
+                buttonAll.setAttribute("value", "All");
+                buttonAll.setAttribute("class","button-option");
+                buttonAll.addEventListener('click',showAll , false);
 
                 ulOption.appendChild(itemLeft);
                 ulOption.appendChild(buttonClearAll);
                 ulOption.appendChild(buttonClearDone); 
+                ulOption.appendChild(buttonActive);
+                ulOption.appendChild(buttonCompleted);
+                ulOption.appendChild(buttonAll);    
             }
             totalItem();
+            
+        }
+        // select show for active, completed or all
+        if(selectShow==='all'){
+            showAll();
+        }
+        if(selectShow==='active'){
+            hiddenCompletedItem();
+        }
+        if(selectShow==='completed'){
+            hiddenActiveItem();
         }
                 
     }
@@ -63,8 +107,9 @@ function inputKeyPress(event){
 
 function onIconClick(e){
     // create icon complete and label
+    arrayUpdateCheckCompleteItem(e.target.parentElement.getAttribute('numberItem'));
     const iconComplete = document.createElement('i');
-    iconComplete.setAttribute("class", "far fa-check-circle");
+    iconComplete.setAttribute("class", "icon check-circle");
     iconComplete.addEventListener('click',onNextClick,false);
 
     const value = e.target.parentNode.querySelector("#content-todo").innerText;
@@ -77,14 +122,15 @@ function onIconClick(e){
     // replace icon uncomplete and label 
     e.target.parentElement.replaceChild(newLabel,e.target.parentNode.querySelector("#content-todo"));
     e.target.parentElement.replaceChild(iconComplete,e.target);
-
+    
     totalItem();
 }
 
 function onNextClick(e){
     // create icon uncomplete and label
+    arrayUpdateCheckCompleteItem(e.target.parentElement.getAttribute('numberItem'));
     const iconUnComplete = document.createElement('i');
-    iconUnComplete.setAttribute("class", "far fa-circle");
+    iconUnComplete.setAttribute("class", "icon circle");
     iconUnComplete.addEventListener('click',onIconClick,false);
 
     const value = e.target.parentNode.querySelector("#content-todo").innerText;
@@ -98,9 +144,11 @@ function onNextClick(e){
     e.target.parentElement.replaceChild(iconUnComplete,e.target);
 
     totalItem();
+    
 }
 
 function deleteTodo(e){
+    arrayUpdateDeleteItem(e.target.parentElement.getAttribute('numberItem'));
     e.target.parentElement.remove();
     totalTodo = totalTodo - 1;
     if(totalTodo<=0){
@@ -110,20 +158,21 @@ function deleteTodo(e){
 }
 
 function deleteAll(){
-    let list = document.getElementById('list-content').querySelectorAll(".far");
+    arrayUpdateDeleteAllItem();
+    let list = document.getElementById('list-content').querySelectorAll(".icon");
     list.forEach(element => {
-        if(element.getAttribute("class")==="far fa-check-circle"||element.getAttribute("class")==="far fa-circle")
+        if(element.getAttribute("class")==="icon check-circle"||element.getAttribute("class")==="icon circle")
         element.parentElement.remove();
-        console.log("djasfsdaf");
     });
     deleteOption();
     
 }
 
 function deleteDone(){
-    let list = document.getElementById('list-content').querySelectorAll(".far");
+    arrayUpdateDeleteCompletedItem();
+    let list = document.getElementById('list-content').querySelectorAll(".icon");
     list.forEach(element => {
-        if(element.getAttribute("class")==="far fa-check-circle"){
+        if(element.getAttribute("class")==="icon check-circle"){
             element.parentElement.remove();
             totalTodo = totalTodo -1;
             totalItem();
@@ -148,9 +197,135 @@ function deleteOption(){
 function totalItem(){
     const itemLeft = document.getElementById('total-item');
     const newItemLeft = document.createElement('p');
-    const textItemLeft = document.createTextNode("Total Item : "+totalTodo);
+    const textItemLeft = document.createTextNode("item left : "+totalTodo);
     newItemLeft.setAttribute("id", "total-item");
     newItemLeft.appendChild(textItemLeft);
     if(totalTodo>0)
     itemLeft.parentElement.replaceChild(newItemLeft, itemLeft);
 }
+
+function addList(id, text, status){
+    arrayList.push({ id, text, status});
+}
+
+function arrayUpdateDeleteItem(numberItem){
+    console.log(numberItem);
+    for(let i=0; i<arrayList.length; i++){
+        if(arrayList[i].id == numberItem){
+            arrayList.splice(i,1);
+        }
+    } 
+}
+
+function arrayUpdateDeleteAllItem(){
+    arrayList.splice(0,arrayList.length);
+}
+
+function arrayUpdateDeleteCompletedItem(){
+    arrayList = arrayList.filter(function(element){
+        console.log(element);
+        return element.status===false;
+    })
+}
+
+function arrayUpdateCheckCompleteItem(id){
+    arrayList.forEach(element => {
+        if(element.id == id){
+            element.status = !element.status;
+        }
+    });
+    
+}
+
+function selectAll(){
+    let li = document.querySelectorAll("#li-component");
+    let countCompleted=0;
+    li.forEach(element => {
+        if(element.children[0].getAttribute('class')==='icon check-circle'){
+            countCompleted++;
+        }
+    });
+    if(countCompleted==(li.length)){
+        console.log("countCompleted1: "+countCompleted);
+        li.forEach(element => {
+            if(element.children[0].getAttribute('class') == 'icon check-circle'){
+                element.children[0].removeAttribute('class');
+                element.children[1].removeAttribute('class');
+                element.children[0].setAttribute('class','icon circle');
+            }
+        });
+    }else{
+        li.forEach(element => {
+            if(element.children[0].getAttribute('class') == 'icon circle'){
+                console.log(element.children[1]);
+                element.children[1].setAttribute("class","radioComplete");
+                element.children[0].removeAttribute('class');
+                element.children[0].setAttribute("class","icon check-circle");
+            }
+        });
+    }
+    // cap nhat array
+   li.forEach(element => {
+       arrayList.forEach(value => {
+           if(element.getAttribute('numberItem') ==value.id){
+              if(element.children[0].getAttribute('class') == 'icon check-circle'){
+                  value.status = true;
+              }else{
+                  value.status = false;
+              }
+           }
+       });
+   });
+}
+
+function hiddenCompletedItem(){
+    showAll();
+    selectShow='active';
+    let li = document.querySelectorAll('#li-component');
+    li.forEach(element => {
+        if(element.children[0].getAttribute("class") == "icon check-circle"){
+            element.style.height = 0;
+            element.style.border = 'none';
+            element.children[0].setAttribute("hidden","");
+            element.children[1].setAttribute("hidden","");
+            element.children[2].setAttribute("hidden","");
+        } 
+    });
+}
+
+function hiddenActiveItem(){
+    showAll();
+    selectShow='completed';
+    let li = document.querySelectorAll('#li-component');
+    li.forEach(element => {
+        if(element.children[0].getAttribute("class") == "icon circle"){
+            element.style.height = 0;
+            element.style.border = 'none';
+            element.children[0].setAttribute("hidden","");
+            element.children[1].setAttribute("hidden","");
+            element.children[2].setAttribute("hidden","");
+        } 
+    });
+}
+
+function showAll(){
+    selectShow='all';
+    let li = document.querySelectorAll('#li-component');
+    li.forEach(element=>{
+        element.removeAttribute("style");
+        element.children[0].removeAttribute("hidden");
+        element.children[1].removeAttribute("hidden");
+        element.children[2].removeAttribute("hidden");
+    });
+}
+
+function editText(event){
+
+    let input = document.createElement('input');
+    input.setAttribute("value","hihi");
+    input.setAttribute("autofocus","");
+    input.setAttribute("autocomplete","off");
+    input.setAttribute('class', 'text-edit');
+    event.target.parentElement.replaceChild(input, event.target);
+}
+
