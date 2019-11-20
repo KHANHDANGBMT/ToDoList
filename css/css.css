@@ -81,7 +81,7 @@ body {
     opacity: 0.5;
 }
 #option {
-    width: 500px;
+    width: 540px;
     text-align: center;
     display: flex;
     flex-direction: row;
@@ -97,7 +97,7 @@ body {
     font-size: 15px;
     /* outline: 1px solid orange; */
 }
-#total-item {
+#item-left {
     opacity: 0.5;
     font-family: sans-serif;
 }

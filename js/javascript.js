@@ -59,7 +59,7 @@ function inputKeyPress(event){
                 
                 const itemLeft = document.createElement('p');
                 const textItemLeft = document.createTextNode("item left: "+totalTodo);
-                itemLeft.setAttribute("id", "total-item");
+                itemLeft.setAttribute("id", "item-left");
                 itemLeft.appendChild(textItemLeft);
 
                 const buttonActive = document.createElement('input');
@@ -104,8 +104,7 @@ function inputKeyPress(event){
 }
 
 function onIconClick(e){
-    // create icon complete and label
-    arrayUpdateCheckCompleteItem(e.target.parentElement.getAttribute('numberItem'));
+    // create icon complete and label   
     const iconComplete = document.createElement('i');
     iconComplete.setAttribute("class", "icon check-circle");
     iconComplete.addEventListener('click',onNextClick,false);
@@ -122,11 +121,11 @@ function onIconClick(e){
     e.target.parentElement.replaceChild(iconComplete,e.target);
     
     totalItem();
+    updateArrFull();
 }
 
 function onNextClick(e){
     // create icon uncomplete and label
-    arrayUpdateCheckCompleteItem(e.target.parentElement.getAttribute('numberItem'));
     const iconUnComplete = document.createElement('i');
     iconUnComplete.setAttribute("class", "icon circle");
     iconUnComplete.addEventListener('click',onIconClick,false);
@@ -142,32 +141,32 @@ function onNextClick(e){
     e.target.parentElement.replaceChild(iconUnComplete,e.target);
 
     totalItem();
+    updateArrFull();
     
 }
 
 function deleteTodo(e){
-    arrayUpdateDeleteItem(e.target.parentElement.getAttribute('numberItem'));
     e.target.parentElement.remove();
     totalTodo = totalTodo - 1;
     if(totalTodo<=0){
         deleteOption();
     }
     totalItem();
+    updateArrFull();
 }
 
 function deleteAll(){
-    arrayUpdateDeleteAllItem();
+    arrayList=[];
+    totalTodo =0;
     let list = document.getElementById('list-content').querySelectorAll(".icon");
     list.forEach(element => {
-        if(element.getAttribute("class")==="icon check-circle"||element.getAttribute("class")==="icon circle")
         element.parentElement.remove();
     });
     deleteOption();
-    
+    totalItem();
 }
 
 function deleteDone(){
-    arrayUpdateDeleteCompletedItem();
     let list = document.getElementById('list-content').querySelectorAll(".icon");
     list.forEach(element => {
         if(element.getAttribute("class")==="icon check-circle"){
@@ -179,7 +178,7 @@ function deleteDone(){
     if(totalTodo<=0){
         deleteOption();
     }
-    
+    updateArrFull();
 }
 
 function deleteOption(){
@@ -187,50 +186,34 @@ function deleteOption(){
     ulOption.forEach(element=>{
         element.remove();
     })
-    const itemLeft = document.getElementById('total-item');
-    itemLeft.remove();
-    totalTodo =  0;
 }
 
 function totalItem(){
-    const itemLeft = document.getElementById('total-item');
+    let i = document.querySelectorAll("i");
+    let itemleft =0;
+    i.forEach(element => {
+        if(element.getAttribute("class")==="icon circle"){
+            itemleft ++;
+        }
+    });
+
+    const itemLeft = document.getElementById('item-left');
     const newItemLeft = document.createElement('p');
-    const textItemLeft = document.createTextNode("item left : "+totalTodo);
-    newItemLeft.setAttribute("id", "total-item");
+    const textItemLeft = document.createTextNode("item left : "+itemleft);
+    newItemLeft.setAttribute("id", "item-left");
     newItemLeft.appendChild(textItemLeft);
     if(totalTodo>0)
     itemLeft.parentElement.replaceChild(newItemLeft, itemLeft);
+    else {
+        const itemLeft = document.getElementById('item-left');
+        itemLeft.remove();
+        deleteOption();
+    }
+    
 }
 
 function addList(id, text, status){
     arrayList.push({ id, text, status});
-}
-
-function arrayUpdateDeleteItem(numberItem){
-    for(let i=0; i<arrayList.length; i++){
-        if(arrayList[i].id == numberItem){
-            arrayList.splice(i,1);
-        }
-    } 
-}
-
-function arrayUpdateDeleteAllItem(){
-    arrayList.splice(0,arrayList.length);
-}
-
-function arrayUpdateDeleteCompletedItem(){
-    arrayList = arrayList.filter(function(element){
-        return element.status===false;
-    })
-}
-
-function arrayUpdateCheckCompleteItem(id){
-    arrayList.forEach(element => {
-        if(element.id == id){
-            element.status = !element.status;
-        }
-    });
-    
 }
 
 function selectAll(){
@@ -258,18 +241,8 @@ function selectAll(){
             }
         });
     }
-    // cap nhat array
-   li.forEach(element => {
-       arrayList.forEach(value => {
-           if(element.getAttribute('numberItem') ==value.id){
-              if(element.children[0].getAttribute('class') == 'icon check-circle'){
-                  value.status = true;
-              }else{
-                  value.status = false;
-              }
-           }
-       });
-   });
+   updateArrFull();
+   totalItem();
 }
 
 function hiddenCompletedItem(){
@@ -328,7 +301,8 @@ function onChangeContent(event){
     let contentEdit = String(event.target.value);
     if(contentEdit===''){
         event.target.parentElement.remove();
-        updateArrFull();
+        totalTodo = totalTodo-1;
+        totalItem();
     }else{
         let content = document.createTextNode(contentEdit);
         let label = document.createElement('lable');
@@ -342,7 +316,7 @@ function onChangeContent(event){
 
 function updateArrFull (){
     let li = document.querySelectorAll('li');
-    console.log(li.length);
+    arrayList=[];
     for(let i=0; i<li.length;i++){
         if(li[i].children[0].getAttribute('class')==='icon circle')
         arrayList[i]={
