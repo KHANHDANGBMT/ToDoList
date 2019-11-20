@@ -17,7 +17,6 @@ function inputKeyPress(event){
             li.setAttribute("id","li-component");
             li.setAttribute("numberItem",numberItem);
             numberItem ++;
-
             // create icon
             const i = document.createElement("i");
             i.setAttribute("class", "icon circle");
@@ -88,8 +87,7 @@ function inputKeyPress(event){
                 ulOption.appendChild(buttonCompleted);
                 ulOption.appendChild(buttonAll);    
             }
-            totalItem();
-            
+            totalItem(); 
         }
         // select show for active, completed or all
         if(selectShow==='all'){
@@ -209,7 +207,6 @@ function addList(id, text, status){
 }
 
 function arrayUpdateDeleteItem(numberItem){
-    console.log(numberItem);
     for(let i=0; i<arrayList.length; i++){
         if(arrayList[i].id == numberItem){
             arrayList.splice(i,1);
@@ -223,7 +220,6 @@ function arrayUpdateDeleteAllItem(){
 
 function arrayUpdateDeleteCompletedItem(){
     arrayList = arrayList.filter(function(element){
-        console.log(element);
         return element.status===false;
     })
 }
@@ -246,7 +242,6 @@ function selectAll(){
         }
     });
     if(countCompleted==(li.length)){
-        console.log("countCompleted1: "+countCompleted);
         li.forEach(element => {
             if(element.children[0].getAttribute('class') == 'icon check-circle'){
                 element.children[0].removeAttribute('class');
@@ -257,7 +252,6 @@ function selectAll(){
     }else{
         li.forEach(element => {
             if(element.children[0].getAttribute('class') == 'icon circle'){
-                console.log(element.children[1]);
                 element.children[1].setAttribute("class","radioComplete");
                 element.children[0].removeAttribute('class');
                 element.children[0].setAttribute("class","icon check-circle");
@@ -320,12 +314,47 @@ function showAll(){
 }
 
 function editText(event){
-
+    const valueContent = event.target.innerText;
     let input = document.createElement('input');
-    input.setAttribute("value","hihi");
+    input.setAttribute("value",valueContent);
     input.setAttribute("autofocus","");
     input.setAttribute("autocomplete","off");
     input.setAttribute('class', 'text-edit');
+    input.addEventListener('change',onChangeContent);
     event.target.parentElement.replaceChild(input, event.target);
 }
 
+function onChangeContent(event){
+    let contentEdit = String(event.target.value);
+    if(contentEdit===''){
+        event.target.parentElement.remove();
+        updateArrFull();
+    }else{
+        let content = document.createTextNode(contentEdit);
+        let label = document.createElement('lable');
+        label.setAttribute("id","content-todo");
+        label.appendChild(content);
+        label.addEventListener('dblclick',editText);
+        event.target.parentElement.replaceChild(label, event.target);
+    }
+    updateArrFull();
+}
+
+function updateArrFull (){
+    let li = document.querySelectorAll('li');
+    console.log(li.length);
+    for(let i=0; i<li.length;i++){
+        if(li[i].children[0].getAttribute('class')==='icon circle')
+        arrayList[i]={
+            id: i,
+            text: li[i].children[1].innerText,
+            status: false
+        }
+        else
+            arrayList[i]={
+            id: i,
+            text: li[i].children[1].innerText,
+            status: true
+        }
+    }
+}
