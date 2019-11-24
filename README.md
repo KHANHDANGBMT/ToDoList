@@ -1,7 +1,7 @@
-## To do list
-# link: 
+# To do list
+## link: 
 https://khanhdangbmt.github.io/ToDoList/
-# Purpose
+## Purpose
 Use to write and save what you needs to complete and what will you do in next time
-# Using
+## Using
 click to link and write what you want
