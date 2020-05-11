@@ -2,26 +2,32 @@ let totalTodo = 0 ;
 let arrayList = [];
 let numberItem = 0;
 let selectShow = 'all';
+const keyEnter = 13;
 let select = document.getElementById("select-all");
 select.addEventListener('click',selectAll);
 
 function inputKeyPress(event){
-    if((event.keyCode ==13||event.which==13) ){
+    if((event.keyCode === keyEnter||event.which=== keyEnter) ){
         event.preventDefault();
         // create li
-        const valueInput = document.getElementById("input-todo").value;
+        createListItem();
+        // select show for active, completed or all
+        selectToShowList();
+    }
+}
+
+function createListItem(){
+    const valueInput = document.getElementById("input-todo").value;
         if(valueInput){
             const content = document.createTextNode(valueInput);
             const ul = document.getElementById("list-content");
+            // create li
             const li = document.createElement("li");
             li.setAttribute("id","li-component");
             li.setAttribute("numberItem",numberItem);
             numberItem ++;
             // create icon
-            const i = document.createElement("i");
-            i.setAttribute("class", "icon circle");
-            i.addEventListener('click',onIconClick,false);
-            li.appendChild(i);
+            createIconCheck(li);
             // create label
             const label = document.createElement("label");
             label.setAttribute("id","content-todo");
@@ -29,77 +35,115 @@ function inputKeyPress(event){
             label.addEventListener('dblclick',editText);
             li.appendChild(label);
             // button
-            const button = document.createElement("button");
-            button.setAttribute("id", "button");
-            const node = document.createTextNode("X");
-            button.appendChild(node);
-            button.addEventListener('click',deleteTodo,false);
-            li.appendChild(button);
-
+            createButtonDelete(li);
+            // add li
             ul.appendChild(li);
-
             addList(numberItem-1,valueInput, false);
             // input ="" before add new todo
             document.getElementById("input-todo").value ="";
             totalTodo+=1;
-            // create option if alive todo
-            if(totalTodo==1){  
-                const ulOption = document.getElementById('option');
-                const buttonClearAll = document.createElement('input');
-                buttonClearAll.setAttribute("type", "button");
-                buttonClearAll.setAttribute("value", "Clear All");
-                buttonClearAll.setAttribute("class","button-option");
-                buttonClearAll.addEventListener('click', deleteAll,false);
-        
-                const buttonClearDone = document.createElement('input');
-                buttonClearDone.setAttribute("type", "button");
-                buttonClearDone.setAttribute("value", "Clear Done");
-                buttonClearDone.setAttribute("class","button-option");
-                buttonClearDone.addEventListener('click', deleteDone, false);
-                
-                const itemLeft = document.createElement('p');
-                const textItemLeft = document.createTextNode("item left: "+totalTodo);
-                itemLeft.setAttribute("id", "item-left");
-                itemLeft.appendChild(textItemLeft);
-
-                const buttonActive = document.createElement('input');
-                buttonActive.setAttribute("type", "button");
-                buttonActive.setAttribute("value", "Active");
-                buttonActive.setAttribute("class","button-option");
-                buttonActive.addEventListener('click', hiddenCompletedItem, false);
-                
-                const buttonCompleted = document.createElement('input');
-                buttonCompleted.setAttribute("type", "button");
-                buttonCompleted.setAttribute("value", "Completed");
-                buttonCompleted.setAttribute("class","button-option");
-                buttonCompleted.addEventListener('click',hiddenActiveItem , false);
-
-                const buttonAll = document.createElement('input');
-                buttonAll.setAttribute("type", "button");
-                buttonAll.setAttribute("value", "All");
-                buttonAll.setAttribute("class","button-option");
-                buttonAll.addEventListener('click',showAll , false);
-
-                ulOption.appendChild(itemLeft);
-                ulOption.appendChild(buttonClearAll);
-                ulOption.appendChild(buttonClearDone); 
-                ulOption.appendChild(buttonActive);
-                ulOption.appendChild(buttonCompleted);
-                ulOption.appendChild(buttonAll);    
-            }
+            createItem();   
             totalItem(); 
         }
-        // select show for active, completed or all
-        if(selectShow==='all'){
+}
+
+function createButtonDelete(li = {}){
+    const button = document.createElement("button");
+    button.setAttribute("id", "button");
+    const node = document.createTextNode("X");
+    button.appendChild(node);
+    button.addEventListener('click',deleteTodo,false);
+    li.appendChild(button);
+}
+
+function createIconCheck(li = {}){
+    const i = document.createElement("i");
+    i.setAttribute("class", "icon circle");
+    i.addEventListener('click',onIconClick,false);
+    li.appendChild(i);
+}
+
+function createItem(){
+    if(totalTodo===1){  
+        const ulOption = document.getElementById('option');
+        // ulOption.appendChild(itemLeft);
+        appendItemLeft(ulOption);
+        appendButtonAll(ulOption);
+        appendButtonClearAll(ulOption);
+        appendButtonClearDone(ulOption);
+        appendButtonActive(ulOption);
+        appendButtonCompleted(ulOption);
+    }
+}
+
+function appendButtonClearAll(ulOption = {}){
+    const buttonClearAll = document.createElement('input');
+    buttonClearAll.setAttribute("type", "button");
+    buttonClearAll.setAttribute("value", "Clear All");
+    buttonClearAll.setAttribute("class","button-option");
+    buttonClearAll.addEventListener('click', deleteAll,false);
+    ulOption.appendChild(buttonClearAll);
+}
+
+function appendButtonClearDone(ulOption = {}){
+    const buttonClearDone = document.createElement('input');
+    buttonClearDone.setAttribute("type", "button");
+    buttonClearDone.setAttribute("value", "Clear Done");
+    buttonClearDone.setAttribute("class","button-option");
+    buttonClearDone.addEventListener('click', deleteDone, false);
+    ulOption.appendChild(buttonClearDone);
+}
+
+function appendButtonActive(ulOption = {}){
+    const buttonActive = document.createElement('input');
+    buttonActive.setAttribute("type", "button");
+    buttonActive.setAttribute("value", "Active");
+    buttonActive.setAttribute("class","button-option");
+    buttonActive.addEventListener('click', setActiveClick, false);
+    ulOption.appendChild(buttonActive);
+}
+
+function appendButtonCompleted(ulOption = {}){
+    const buttonCompleted = document.createElement('input');
+    buttonCompleted.setAttribute("type", "button");
+    buttonCompleted.setAttribute("value", "Completed");
+    buttonCompleted.setAttribute("class","button-option");
+    buttonCompleted.addEventListener('click',setCompletedClick , false);
+    ulOption.appendChild(buttonCompleted);
+
+}
+
+function appendButtonAll(ulOption = {}){
+    const buttonAll = document.createElement('input');
+    buttonAll.setAttribute("type", "button");
+    buttonAll.setAttribute("value", "All");
+    buttonAll.setAttribute("class","button-option");
+    buttonAll.addEventListener('click',showAll , false);
+    ulOption.appendChild(buttonAll);
+}
+
+function appendItemLeft(ulOption = {}){
+    const itemLeft = document.createElement('p');
+    const textItemLeft = document.createTextNode("item left: "+totalTodo);
+    itemLeft.setAttribute("id", "item-left");
+    itemLeft.appendChild(textItemLeft);
+    ulOption.appendChild(itemLeft);
+}
+
+function selectToShowList(){
+    switch(selectShow){
+        case 'all':{
             showAll();
+            break;
         }
-        if(selectShow==='active'){
-            hiddenCompletedItem();
+        case 'active':{
+            hiddenItem();
+            break;
         }
-        if(selectShow==='completed'){
-            hiddenActiveItem();
+        case 'completed':{
+            hiddenItem();
+            break;
         }
-                
     }
 }
 
@@ -122,6 +166,7 @@ function onIconClick(e){
     
     totalItem();
     updateArrFull();
+    selectToShowList();
 }
 
 function onNextClick(e){
@@ -142,7 +187,7 @@ function onNextClick(e){
 
     totalItem();
     updateArrFull();
-    
+    selectToShowList();
 }
 
 function deleteTodo(e){
@@ -202,8 +247,9 @@ function totalItem(){
     const textItemLeft = document.createTextNode("item left : "+itemleft);
     newItemLeft.setAttribute("id", "item-left");
     newItemLeft.appendChild(textItemLeft);
-    if(totalTodo>0)
-    itemLeft.parentElement.replaceChild(newItemLeft, itemLeft);
+    if(totalTodo>0){
+        itemLeft.parentElement.replaceChild(newItemLeft, itemLeft);
+    }
     else {
         const itemLeft = document.getElementById('item-left');
         itemLeft.remove();
@@ -224,9 +270,9 @@ function selectAll(){
             countCompleted++;
         }
     });
-    if(countCompleted==(li.length)){
+    if(countCompleted===(li.length)){
         li.forEach(element => {
-            if(element.children[0].getAttribute('class') == 'icon check-circle'){
+            if(element.children[0].getAttribute('class') === 'icon check-circle'){
                 element.children[0].removeAttribute('class');
                 element.children[1].removeAttribute('class');
                 element.children[0].setAttribute('class','icon circle');
@@ -234,7 +280,7 @@ function selectAll(){
         });
     }else{
         li.forEach(element => {
-            if(element.children[0].getAttribute('class') == 'icon circle'){
+            if(element.children[0].getAttribute('class') === 'icon circle'){
                 element.children[1].setAttribute("class","radioComplete");
                 element.children[0].removeAttribute('class');
                 element.children[0].setAttribute("class","icon check-circle");
@@ -245,27 +291,24 @@ function selectAll(){
    totalItem();
 }
 
-function hiddenCompletedItem(){
+function setActiveClick(){
     showAll();
-    selectShow='active';
-    let li = document.querySelectorAll('#li-component');
-    li.forEach(element => {
-        if(element.children[0].getAttribute("class") == "icon check-circle"){
-            element.style.height = 0;
-            element.style.border = 'none';
-            element.children[0].setAttribute("hidden","");
-            element.children[1].setAttribute("hidden","");
-            element.children[2].setAttribute("hidden","");
-        } 
-    });
+    selectShow = 'active';
+    hiddenItem();
 }
 
-function hiddenActiveItem(){
+function setCompletedClick(){
     showAll();
-    selectShow='completed';
+    selectShow ='completed';
+    hiddenItem();
+}
+
+function hiddenItem(){
     let li = document.querySelectorAll('#li-component');
+    console.log(selectShow);
     li.forEach(element => {
-        if(element.children[0].getAttribute("class") == "icon circle"){
+        if((element.children[0].getAttribute("class") === "icon check-circle" && selectShow==="active") || 
+        (element.children[0].getAttribute("class") === "icon circle" && selectShow ==="completed")){
             element.style.height = 0;
             element.style.border = 'none';
             element.children[0].setAttribute("hidden","");
@@ -299,7 +342,7 @@ function editText(event){
 
 function onChangeContent(event){
     let contentEdit = String(event.target.value);
-    if(contentEdit===''){
+    if(!contentEdit){
         event.target.parentElement.remove();
         totalTodo = totalTodo-1;
         totalItem();
